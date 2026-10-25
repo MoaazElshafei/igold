@@ -51,7 +51,7 @@ function drawChart(hist) {
     svg.innerHTML = ""; $("ticks").innerHTML = ""; $("chart-empty").hidden = false; return;
   }
   $("chart-empty").hidden = true;
-  const W = 300, H = 80, pad = 6;
+  const W = 300, H = 64, pad = 6;
   const t0 = pts[0][0], t1 = pts[pts.length - 1][0];
   let min = Math.min(...pts.map((p) => p[3])), max = Math.max(...pts.map((p) => p[3]));
   if (max - min < 1) { max += 0.5; min -= 0.5; }
@@ -119,6 +119,7 @@ function render(snap, fromCache) {
     cc.textContent = "—"; cc.className = ""; $("chart-lbl").textContent = "جاري جمع البيانات";
   }
   drawChart(hist);
+  if (window.igoldFit) window.igoldFit();
 
   const t = new Date(snap.updated_at);
   const stale = fromCache || (Date.now() - t.getTime()) / 60000 > STALE_MIN;
@@ -150,6 +151,7 @@ document.querySelectorAll(".tab").forEach((btn) =>
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
     $("gold").hidden = btn.dataset.tab !== "gold";
     $("fx").hidden = btn.dataset.tab !== "fx";
+    if (window.igoldFit) window.igoldFit();
   })
 );
 
