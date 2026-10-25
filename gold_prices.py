@@ -161,6 +161,50 @@ def save_atomic(path, data):
     os.replace(tmp, path)  # readers never see a half-written file
 
 
+HISTORY_MAX_AGE = 26 * 3600   # keep ~a day of points
+HISTORY_MIN_GAP = 180         # seconds; avoid duplicate points from close runs
+
+
+def sb_headers(key, extra=None):
+    h = {"apikey": key, **(extra or {})}
+    if key.startswith("eyJ"):  # legacy JWT keys also need Authorization
+        h["Authorization"] = f"Bearer {key}"
+    return h
+
+
+def load_history():
+    """Previous history points: [[unix_ts, ounce_usd, usd_egp, sell21], ...]"""
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = os.environ.get("SUPABASE_SERVICE_KEY")
+    try:
+        if url and key:
+            rows = http_get_json(f"{url}/rest/v1/prices?id=eq.1&select=data", sb_headers(key))
+            return list(rows[0]["data"].get("history", [])) if rows else []
+        with open(OUTPUT_FILE, encoding="utf-8") as f:
+            return list(json.load(f).get("history", []))
+    except Exception:
+        return []
+
+
+def update_history(hist, snap, now=None):
+    now = int(now if now is not None else time.time())
+    point = [
+        now,
+        snap["global"]["ounce_usd"],
+        snap["global"]["usd_egp"],
+        snap["egypt_gold_per_gram_egp"]["21"]["sell"],
+    ]
+    hist = [
+        p for p in hist
+        if isinstance(p, list) and len(p) == 4 and now - p[0] <= HISTORY_MAX_AGE
+    ]
+    if hist and now - hist[-1][0] < HISTORY_MIN_GAP:
+        hist[-1] = point
+    else:
+        hist.append(point)
+    return hist
+
+
 def upload_supabase(snap):
     """Upsert the snapshot into Supabase table `prices` (id=1).
     Needs env SUPABASE_URL and SUPABASE_SERVICE_KEY. Skipped if not set."""
@@ -173,13 +217,10 @@ def upload_supabase(snap):
         f"{url}/rest/v1/prices?on_conflict=id",
         data=body,
         method="POST",
-        headers={
-            "apikey": key,
+        headers=sb_headers(key, {
             "Content-Type": "application/json",
             "Prefer": "resolution=merge-duplicates,return=minimal",
-            # legacy JWT keys (eyJ...) also need Authorization; sb_secret_ keys don't
-            **({"Authorization": f"Bearer {key}"} if key.startswith("eyJ") else {}),
-        },
+        }),
     )
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
         if resp.status >= 300:
@@ -189,6 +230,7 @@ def upload_supabase(snap):
 
 def run_once():
     snap = build_snapshot()
+    snap["history"] = update_history(load_history(), snap)
     save_atomic(OUTPUT_FILE, snap)
     if upload_supabase(snap):
         print("uploaded to Supabase")
