@@ -7,7 +7,7 @@ const STALE_MIN = 20; // mark data stale after this many minutes
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
-  Number(n).toLocaleString("ar-EG", { minimumFractionDigits: d, maximumFractionDigits: d });
+     Number(n).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 
 function row(label, value) {
   return `<div class="row"><span>${label}</span><b>${value}</b></div>`;
@@ -32,7 +32,7 @@ function render(snap, fromCache) {
   const stale = fromCache || ageMin > STALE_MIN;
   $("dot").className = "dot " + (stale ? "stale" : "ok");
   $("updated").textContent =
-    "آخر تحديث: " + t.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) +
+       "آخر تحديث: " + t.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) +
     (stale ? " (قديم)" : "");
 }
 
