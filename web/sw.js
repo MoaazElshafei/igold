@@ -1,5 +1,5 @@
-const CACHE = "igold-v6";
-const SHELL = ["./", "index.html", "style.css", "fit.js", "app.js", "manifest.json"];
+const CACHE = "igold-v7";
+const SHELL = ["./", "index.html", "style.css", "fit.js", "config.js", "app.js", "manifest.json"];
 
 self.addEventListener("install", (e) => {
   // cache: "reload" skips the browser HTTP cache so we always store the newest files
