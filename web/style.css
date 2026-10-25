@@ -7,10 +7,11 @@
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { font-size: 15px; -webkit-text-size-adjust: 100%; }
+html { background: var(--bg); overscroll-behavior: none; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
-  min-height: 100vh; min-height: 100dvh;
+  overscroll-behavior: none;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
