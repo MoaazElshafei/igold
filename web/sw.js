@@ -1,8 +1,13 @@
-const CACHE = "igold-v5";
+const CACHE = "igold-v6";
 const SHELL = ["./", "index.html", "style.css", "fit.js", "app.js", "manifest.json"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
+  // cache: "reload" skips the browser HTTP cache so we always store the newest files
+  e.waitUntil(
+    caches.open(CACHE).then((c) =>
+      Promise.all(SHELL.map((u) => c.add(new Request(u, { cache: "reload" })).catch(() => {})))
+    )
+  );
   self.skipWaiting();
 });
 
@@ -15,21 +20,19 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+// Network first: always show the latest files; use the cache only when offline.
 self.addEventListener("fetch", (e) => {
-  const url = new URL(e.request.url);
-  // Prices: always try network (app.js keeps its own last-good copy)
-  if (url.hostname.endsWith("supabase.co")) return;
-  // App shell: cache first, refresh in background
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.hostname.endsWith("supabase.co")) return; // prices are handled by app.js
   e.respondWith(
-    caches.match(e.request).then((hit) => {
-      const net = fetch(e.request)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, copy));
-          return res;
-        })
-        .catch(() => hit);
-      return hit || net;
-    })
+    fetch(req, { cache: "no-cache" })
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+        return res;
+      })
+      .catch(() => caches.match(req).then((hit) => hit || caches.match("index.html")))
   );
 });
