@@ -39,7 +39,9 @@ function render(snap, fromCache) {
 async function load() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/prices?id=eq.1&select=data`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: SUPABASE_ANON_KEY.startsWith("eyJ")
+        ? { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        : { apikey: SUPABASE_ANON_KEY },
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const rows = await res.json();
