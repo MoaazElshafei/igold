@@ -1,6 +1,6 @@
 // ====== CONFIG: put your Supabase values here (the ANON key is public by design) ======
-const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const SUPABASE_URL = "https://lowausbdxhjsebejbbeh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NjHAhKays4OAjrsrqhX7og_fTyeQetK";
 const REFRESH_MS = 60 * 1000;
 const STALE_MIN = 20; // mark data stale after this many minutes
 // =====================================================================================
