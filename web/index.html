@@ -7,17 +7,35 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>igold - أسعار الذهب والعملات</title>
   <meta name="description" content="أسعار الذهب في مصر والعالم وأسعار العملات، تحديث تلقائي">
-  <meta name="theme-color" content="#d4a017">
+  <meta name="theme-color" content="#0b0a07">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="gbar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f7dc7d"/><stop offset=".55" stop-color="#d9a52c"/><stop offset="1" stop-color="#8a5f12"/>
+      </linearGradient>
+      <linearGradient id="gtop" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff0b0"/><stop offset="1" stop-color="#e0b43a"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
   <div class="top">
     <header>
-      <h1>igold</h1>
-      <div class="status"><span id="dot" class="dot"></span><span id="updated">جاري التحميل...</span></div>
+      <svg class="logo" viewBox="0 0 48 32" aria-hidden="true">
+        <path d="M6 24 L12 14 H34 L40 24 Z" fill="url(#gbar)"/>
+        <path d="M12 14 L16 7 H30 L34 14 Z" fill="url(#gtop)"/>
+        <path d="M2 30 L7 22 H25 L30 30 Z" fill="url(#gbar)" opacity=".92"/>
+      </svg>
+      <div class="brand">
+        <h1>igold</h1>
+        <p>أسعار الذهب لحظة بلحظة</p>
+      </div>
     </header>
     <nav>
       <button class="tab active" data-tab="gold">الذهب</button>
@@ -27,30 +45,80 @@
 
   <main>
     <section id="gold">
-      <div class="global card">
-        <div><small>الأوقية عالميا</small><strong id="ounce">--</strong><small>دولار</small></div>
-        <div><small>الدولار</small><strong id="usd">--</strong><small>جنيه</small></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="txt">
+            <span class="lbl">سعر الدولار</span>
+            <strong id="usd" class="val">--</strong>
+            <span class="unit">جنيه</span>
+            <span id="usd-chg" class="chg">—</span>
+          </div>
+          <div class="ico usd">$</div>
+        </div>
+        <div class="stat">
+          <div class="txt">
+            <span class="lbl">سعر الأوقية العالمية</span>
+            <strong id="ounce" class="val">--</strong>
+            <span class="unit">دولار</span>
+            <span id="ounce-chg" class="chg">—</span>
+          </div>
+          <svg class="ico bars" viewBox="0 0 48 32" aria-hidden="true">
+            <path d="M6 24 L12 14 H34 L40 24 Z" fill="url(#gbar)"/>
+            <path d="M12 14 L16 7 H30 L34 14 Z" fill="url(#gtop)"/>
+          </svg>
+        </div>
       </div>
 
-      <div class="card pound">
-        <h2>الجنيه الذهب</h2>
-        <div class="row"><span>بيع</span><b id="pound-sell">--</b></div>
-        <div class="row"><span>شراء</span><b id="pound-buy">--</b></div>
+      <div class="hero">
+        <svg class="art" viewBox="0 0 160 110" aria-hidden="true">
+          <path d="M20 95 L45 55 H125 L150 95 Z" fill="url(#gbar)"/>
+          <path d="M45 55 L62 28 H108 L125 55 Z" fill="url(#gtop)"/>
+          <path d="M0 108 L22 78 H92 L114 108 Z" fill="url(#gbar)" opacity=".85"/>
+        </svg>
+        <div class="hero-txt">
+          <span class="h-top">الذهب في مصر</span>
+          <span class="h-k">عيار 21</span>
+          <div class="h-big"><b id="h21">--</b> <span>جنيه</span></div>
+          <div class="h-row">
+            <div><span>سعر الشراء</span><b id="h21-buy" class="up">--</b></div>
+            <div><span>سعر البيع</span><b id="h21-sell">--</b></div>
+          </div>
+        </div>
       </div>
 
-      <h2 class="section">سعر جرام الذهب بالجنيه</h2>
-      <div id="karats" class="grid"></div>
+      <div class="sec"><span>أسعار باقي الأعيرة</span></div>
+      <div id="karats" class="tbl"></div>
+
+      <div class="chart-row">
+        <div class="chart card">
+          <div class="c-title">حركة سعر الذهب (عيار 21)</div>
+          <svg id="chart" viewBox="0 0 300 80" preserveAspectRatio="xMidYMid meet"></svg>
+          <div id="chart-empty" class="c-empty">جاري جمع بيانات الرسم...</div>
+          <div id="ticks" class="ticks"></div>
+        </div>
+        <div class="side">
+          <div class="card pct">
+            <strong id="chart-chg">—</strong>
+            <small id="chart-lbl">خلال 24 ساعة</small>
+          </div>
+          <div class="card upd">
+            <span class="u-top"><i id="dot" class="dot"></i> آخر تحديث</span>
+            <b id="updated">--</b>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="fx" hidden>
-      <h2 class="section">العملات مقابل الجنيه المصري</h2>
-      <div id="currencies" class="grid"></div>
+      <div class="sec"><span>العملات مقابل الجنيه المصري</span></div>
+      <div id="currencies" class="cur-grid"></div>
     </section>
 
     <p class="note">الأسعار استرشادية محسوبة من السعر العالمي، ولا تشمل المصنعية والضرائب، وقد تختلف عن أسعار محلات الصاغة.</p>
   </main>
 
   <script src="fit.js"></script>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
