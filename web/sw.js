@@ -1,5 +1,5 @@
-const CACHE = "igold-v2";
-const SHELL = ["./", "index.html", "style.css", "app.js", "manifest.json"];
+const CACHE = "igold-v3";
+const SHELL = ["./", "index.html", "style.css", "fit.js", "app.js", "manifest.json"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
