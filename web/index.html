@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>igold - أسعار الذهب والعملات</title>
+  <meta name="description" content="أسعار الذهب في مصر والعالم وأسعار العملات، تحديث تلقائي">
+  <meta name="theme-color" content="#d4a017">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>igold</h1>
+    <div class="status"><span id="dot" class="dot"></span><span id="updated">جاري التحميل...</span></div>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="gold">الذهب</button>
+    <button class="tab" data-tab="fx">العملات</button>
+  </nav>
+
+  <main>
+    <section id="gold">
+      <div class="global card">
+        <div><small>الأوقية عالميا</small><strong id="ounce">--</strong><small>دولار</small></div>
+        <div><small>الدولار</small><strong id="usd">--</strong><small>جنيه</small></div>
+      </div>
+
+      <div class="card pound">
+        <h2>الجنيه الذهب</h2>
+        <div class="row"><span>بيع</span><b id="pound-sell">--</b></div>
+        <div class="row"><span>شراء</span><b id="pound-buy">--</b></div>
+      </div>
+
+      <h2 class="section">سعر جرام الذهب بالجنيه</h2>
+      <div id="karats" class="grid"></div>
+    </section>
+
+    <section id="fx" hidden>
+      <h2 class="section">العملات مقابل الجنيه المصري</h2>
+      <div id="currencies" class="grid"></div>
+    </section>
+
+    <p class="note">الأسعار استرشادية محسوبة من السعر العالمي، ولا تشمل المصنعية والضرائب، وقد تختلف عن أسعار محلات الصاغة.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
