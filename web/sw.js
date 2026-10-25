@@ -1,4 +1,4 @@
-const CACHE = "igold-v7";
+const CACHE = "igold-v8";
 const SHELL = ["./", "index.html", "style.css", "fit.js", "config.js", "app.js", "manifest.json"];
 
 self.addEventListener("install", (e) => {
