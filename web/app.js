@@ -94,7 +94,11 @@ function render(snap, fromCache) {
   }
   renderTable(snap);
 
+  // display order: USD/EUR, SAR/AED, QAR/KWD, then the rest
+  const FX_ORDER = ["USD", "EUR", "SAR", "AED", "QAR", "KWD"];
+  const rank = (c) => { const i = FX_ORDER.indexOf(c); return i < 0 ? 99 : i; };
   $("currencies").innerHTML = Object.entries(snap.currencies_vs_egp || {})
+    .sort((a, b) => rank(a[0]) - rank(b[0]))
     .map(([code, v]) => `<div class="cur"><div class="cn">${v.name_ar} <small>${code}</small></div><div class="cv"><b>${nf(v.egp, 3)}</b><span>جنيه</span></div></div>`)
     .join("");
 
