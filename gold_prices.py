@@ -175,9 +175,10 @@ def upload_supabase(snap):
         method="POST",
         headers={
             "apikey": key,
-            "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
             "Prefer": "resolution=merge-duplicates,return=minimal",
+            # legacy JWT keys (eyJ...) also need Authorization; sb_secret_ keys don't
+            **({"Authorization": f"Bearer {key}"} if key.startswith("eyJ") else {}),
         },
     )
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
