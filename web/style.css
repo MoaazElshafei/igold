@@ -96,13 +96,15 @@ small { color: var(--muted); font-size: .68rem; }
 .dot.ok { background: var(--up); box-shadow: 0 0 0 3px rgba(53,208,138,.18); }
 .dot.stale { background: var(--stale); }
 
-/* currencies tab: compact two-column cards so all of them fit one screen */
-.cur-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.cur { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 5px 10px; }
-.cn { font-size: .74rem; font-weight: 700; color: var(--gold); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cn small { font-size: .6rem; }
-.cv { display: flex; align-items: baseline; gap: 5px; }
-.cv b { font-size: 1rem; line-height: 1.25; direction: ltr; }
-.cv span { font-size: .62rem; color: var(--muted); }
+/* currencies tab: cards stretch to fill the screen; fonts grow with the card height (--ch set by fit.js) */
+.cur-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; --ch: 46px; }
+.cur { display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 5px 10px; }
+.cn { font-weight: 700; color: var(--gold); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: min(1.02rem, max(.74rem, calc(var(--ch) * .2))); }
+.cn small { font-size: .8em; }
+.cv { display: flex; align-items: baseline; gap: 6px; }
+.cv b { line-height: 1.2; direction: ltr; font-size: min(1.8rem, max(1rem, calc(var(--ch) * .34))); }
+.cv span { color: var(--muted); font-size: min(.8rem, max(.62rem, calc(var(--ch) * .13))); }
 
 .note { font-size: .6rem; color: var(--muted); line-height: 1.5; margin: 6px 4px 6px; }
