@@ -134,7 +134,7 @@ function render(snap, fromCache) {
 async function load() {
   try {
     if (!CFG.url || !CFG.key) throw new Error("config.js missing");
-    const res = await fetch(`${CFG.url}/rest/v1/prices?id=eq.1&select=data&_=${Date.now()}`, { headers: authHeaders(), cache: "no-store" });
+    const res = await fetch(`${CFG.url}/rest/v1/prices?id=eq.1&select=data`, { headers: authHeaders(), cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const rows = await res.json();
     if (!rows.length) throw new Error("no data");
