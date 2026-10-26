@@ -17,7 +17,7 @@ b, strong { font-variant-numeric: tabular-nums; }
 .top { position: sticky; top: 0; z-index: 5; padding-top: env(safe-area-inset-top);
   background: linear-gradient(#0b0a07ee, #0b0a07cc); backdrop-filter: blur(6px); }
 header { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 6px 14px 2px; }
-.logo { height: 36px; width: auto; display: block; }
+.logo { height: 58px; width: auto; max-width: 92%; display: block; }
 .brand { text-align: start; }
 h1 { margin: 0; font-size: 1.5rem; line-height: 1; letter-spacing: 1px;
   background: linear-gradient(90deg, #f7dc7d, #d9a52c); -webkit-background-clip: text; background-clip: text; color: transparent; }
