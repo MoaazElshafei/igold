@@ -76,19 +76,52 @@ def http_get_json(url, headers=None):
     raise RuntimeError(f"GET {url} failed: {last_err}")
 
 
+def _ounce_gold_api():
+    return float(http_get_json("https://api.gold-api.com/price/XAU")["price"])
+
+
+def _ounce_goldapi_io():
+    key = os.environ.get("GOLDAPI_KEY")
+    if not key:
+        raise RuntimeError("GOLDAPI_KEY not set")
+    data = http_get_json("https://www.goldapi.io/api/XAU/USD", headers={"x-access-token": key})
+    return float(data["price"])
+
+
+def _ounce_goldprice_org():
+    data = http_get_json("https://data-asg.goldprice.org/dbXRates/USD")
+    return float(data["items"][0]["xauPrice"])
+
+
+def _ounce_er_api():
+    xau = fetch_rates().get("XAU")  # units of gold per 1 USD
+    if not xau:
+        raise RuntimeError("XAU missing from rates")
+    return 1.0 / float(xau)
+
+
+# tried in order; the first one that answers with a sane price wins
+OUNCE_SOURCES = [
+    ("gold-api.com", _ounce_gold_api),
+    ("goldapi.io", _ounce_goldapi_io),
+    ("goldprice.org", _ounce_goldprice_org),
+    ("open.er-api.com", _ounce_er_api),
+]
+
+
 def fetch_ounce_usd():
-    """Spot gold price in USD per troy ounce."""
-    try:
-        data = http_get_json("https://api.gold-api.com/price/XAU")
-        return float(data["price"]), "gold-api.com"
-    except Exception as first_err:
-        key = os.environ.get("GOLDAPI_KEY")
-        if not key:
-            raise RuntimeError(f"gold ounce fetch failed: {first_err}")
-        data = http_get_json(
-            "https://www.goldapi.io/api/XAU/USD", headers={"x-access-token": key}
-        )
-        return float(data["price"]), "goldapi.io"
+    """Spot gold price in USD per troy ounce, with several fallback sources."""
+    errors = []
+    for name, fn in OUNCE_SOURCES:
+        try:
+            price = fn()
+            if not (500 < price < 50000):
+                raise ValueError(f"unreasonable price {price}")
+            return price, name
+        except Exception as e:
+            errors.append(f"{name}: {e}")
+            print(f"gold source failed -> {name}: {e}", file=sys.stderr)
+    raise RuntimeError("all gold sources failed: " + " | ".join(errors))
 
 
 def fetch_rates():
