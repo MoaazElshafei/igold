@@ -122,16 +122,19 @@ function render(snap, fromCache) {
   if (window.igoldFit) window.igoldFit();
 
   const t = new Date(snap.updated_at);
-  const stale = fromCache || (Date.now() - t.getTime()) / 60000 > STALE_MIN;
+  const old = (Date.now() - t.getTime()) / 60000 > STALE_MIN;
+  const stale = fromCache || old;
   $("dot").className = "dot " + (stale ? "stale" : "ok");
+  // "(محفوظ)" = the app could not reach the server and shows its saved copy; "(قديم)" = the server data itself is old
   $("updated").textContent =
-    t.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: TZ }) + (stale ? " (قديم)" : "");
+    t.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: TZ }) +
+    (fromCache ? " (محفوظ)" : old ? " (قديم)" : "");
 }
 
 async function load() {
   try {
     if (!CFG.url || !CFG.key) throw new Error("config.js missing");
-    const res = await fetch(`${CFG.url}/rest/v1/prices?id=eq.1&select=data`, { headers: authHeaders() });
+    const res = await fetch(`${CFG.url}/rest/v1/prices?id=eq.1&select=data&_=${Date.now()}`, { headers: authHeaders(), cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const rows = await res.json();
     if (!rows.length) throw new Error("no data");
