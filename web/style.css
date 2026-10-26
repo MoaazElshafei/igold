@@ -51,7 +51,10 @@ small { color: var(--muted); font-size: .68rem; }
 /* hero: gold in Egypt, karat 21 */
 .hero { position: relative; overflow: hidden; margin-top: 8px; border-radius: 16px; padding: 8px 14px;
   border: 1.5px solid #b98a1f; background: linear-gradient(120deg, #1d1606 0%, #100d06 70%); }
-.hero .art { position: absolute; inset-inline-end: -6px; bottom: -6px; width: 44%; max-width: 190px; opacity: .95; }
+.hero .art { position: absolute; inset-inline-end: 0; top: 0; bottom: 0; width: 58%; height: 100%;
+  object-fit: cover; object-position: 30% 50%; opacity: .95;
+  -webkit-mask-image: linear-gradient(to right, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 35%, transparent 100%); }
 .hero-txt { position: relative; display: flex; flex-direction: column; gap: 1px; }
 .h-top { font-size: .85rem; }
 .h-k { font-size: 1rem; font-weight: 700; color: var(--gold); }
