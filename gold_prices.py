@@ -53,6 +53,7 @@ CURRENCIES = {
     "BHD": "الدينار البحريني",
     "JOD": "الدينار الأردني",
     "TRY": "الليرة التركية",
+    "CHF": "الفرنك السويسري",
 }
 
 TIMEOUT = 15
@@ -132,6 +133,52 @@ def fetch_rates():
     return data["rates"]
 
 
+def _live_pair(code):
+    """Live market rate: units of `code` per 1 USD (Yahoo Finance chart API, no key)."""
+    sym = "EGP=X" if code == "EGP" else f"USD{code}=X"
+    data = http_get_json(
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1m&range=1d",
+        headers={"User-Agent": "Mozilla/5.0"},
+    )
+    price = float(data["chart"]["result"][0]["meta"]["regularMarketPrice"])
+    if price <= 0:
+        raise ValueError("bad price")
+    return price
+
+
+def fetch_live_rates():
+    """Near real-time rates for EGP + every currency in CURRENCIES. Failed pairs are skipped."""
+    from concurrent.futures import ThreadPoolExecutor
+    codes = ["EGP"] + [c for c in CURRENCIES if c not in ("USD", "EGP")]
+
+    def one(c):
+        try:
+            return c, _live_pair(c)
+        except Exception as e:
+            print(f"live rate failed -> {c}: {e}", file=sys.stderr)
+            return c, None
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        out = {c: v for c, v in ex.map(one, codes) if v}
+    out["USD"] = 1.0
+    return out
+
+
+def get_rates():
+    """Live rates first; the daily open.er-api.com table fills any gaps / is the fallback."""
+    try:
+        base = fetch_rates()
+    except Exception as e:
+        print(f"daily rates failed: {e}", file=sys.stderr)
+        base = {}
+    live = fetch_live_rates()
+    rates = {**base, **live}
+    if "EGP" not in rates:
+        raise RuntimeError("no USD/EGP rate from any source")
+    src = "yahoo-finance (live)" if "EGP" in live else "open.er-api.com (daily)"
+    return rates, src
+
+
 def gram24_fair(ounce_usd, usd_egp):
     return ounce_usd / OUNCE_GRAMS * usd_egp
 
@@ -171,14 +218,14 @@ def compute_currencies(rates):
 
 def build_snapshot():
     ounce, ounce_src = fetch_ounce_usd()
-    rates = fetch_rates()
+    rates, rates_src = get_rates()
     usd_egp = rates["EGP"]
     karats, pound = compute_gold(ounce, usd_egp)
     return {
         "updated_at": datetime.now(CAIRO).isoformat(timespec="seconds"),
         "is_estimate": True,
         "notes": "أسعار استرشادية محسوبة من السعر العالمي، بدون مصنعية أو ضرائب",
-        "sources": {"gold": ounce_src, "currencies": "open.er-api.com"},
+        "sources": {"gold": ounce_src, "currencies": rates_src},
         "margins": {"sell": MARGIN_SELL, "buy": MARGIN_BUY},
         "global": {"ounce_usd": round(ounce, 2), "usd_egp": round(usd_egp, 4)},
         "egypt_gold_per_gram_egp": karats,
@@ -276,7 +323,7 @@ def run_once():
 
 def calibrate(real_sell24, real_buy24):
     ounce, _ = fetch_ounce_usd()
-    usd_egp = fetch_rates()["EGP"]
+    usd_egp = get_rates()[0]["EGP"]
     fair = gram24_fair(ounce, usd_egp)
     print(f"fair 24K gram now: {fair:.2f} EGP")
     print(f"MARGIN_SELL = {real_sell24 / fair - 1:.4f}")
